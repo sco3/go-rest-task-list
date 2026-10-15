@@ -12,5 +12,7 @@ curl localhost:8080/tasks
 Create tasks:
 
 ```sh
-curl -X POST localhost:8080/tasks -H "Content-Type: application/json" -d '{"title":"New Task"}'
+curl -X POST localhost:8080/tasks \
+   -H "Content-Type: application/json" \
+   -d '{"title":"New Task"}'
 ```
