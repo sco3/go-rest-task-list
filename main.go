@@ -19,9 +19,10 @@ func HandleTasks(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	defer mu.Unlock()
 	fmt.Printf("Method: %v\n", r.Method)
-	if r.Method == "GET" {
+	switch r.Method {
+	case http.MethodGet:
 		json.NewEncoder(w).Encode(tasks)
-	} else if r.Method == "POST" {
+	case http.MethodPost:
 		fmt.Printf("TBD\n")
 		var newTask Task
 		json.NewDecoder(r.Body).Decode(&newTask)
