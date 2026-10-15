@@ -29,6 +29,8 @@ func HandleTasks(w http.ResponseWriter, r *http.Request) {
 		newTask.ID = len(tasks)
 		tasks = append(tasks, newTask)
 		w.WriteHeader(http.StatusCreated)
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
 
 }
