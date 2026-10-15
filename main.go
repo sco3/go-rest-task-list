@@ -12,22 +12,32 @@ type Task struct {
 	Title string `json:"title"`
 }
 
-var tasks []Task = make([]Task, 0)
-var mu sync.Mutex
+type TaskStore struct {
+	tasks []Task
+	mu    sync.Mutex
+}
 
-func HandleTasks(w http.ResponseWriter, r *http.Request) {
-	mu.Lock()
-	defer mu.Unlock()
+func NewTaskStore() *TaskStore {
+	return &TaskStore{
+		tasks: []Task{
+			{ID: 0, Title: "Init"},
+		},
+	}
+}
+
+func (s *TaskStore) HandleTasks(w http.ResponseWriter, r *http.Request) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	fmt.Printf("Method: %v\n", r.Method)
 	switch r.Method {
 	case http.MethodGet:
-		json.NewEncoder(w).Encode(tasks)
+		json.NewEncoder(w).Encode(s.tasks)
 	case http.MethodPost:
 		fmt.Printf("TBD\n")
 		var newTask Task
 		json.NewDecoder(r.Body).Decode(&newTask)
-		newTask.ID = len(tasks)
-		tasks = append(tasks, newTask)
+		newTask.ID = len(s.tasks)
+		s.tasks = append(s.tasks, newTask)
 		w.WriteHeader(http.StatusCreated)
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -36,11 +46,7 @@ func HandleTasks(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	init := Task{
-		ID:    0,
-		Title: "Init",
-	}
-	tasks = append(tasks, init)
-	http.HandleFunc("/tasks", HandleTasks)
+	taskStore := NewTaskStore()
+	http.HandleFunc("/tasks", taskStore.HandleTasks)
 	http.ListenAndServe(":8080", nil)
 }
